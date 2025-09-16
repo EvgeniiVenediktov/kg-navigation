@@ -22,9 +22,13 @@ cat = EX.Cat
 
 # Classes
 animal = EX.Animal
+pet = EX.Pet
 light_obstacle = EX.LightObstacle
 living_being = EX.LivingBeing
 heavy_obstacle = EX.HeavyObstacle
+
+# Damage hierarchy 
+# Pedestrian > Motorcycle > Cycler > Pet > Animal > Vehicle > ...
 
 # Behaviors
 behavior_avoid = EX.BehaviorAvoid
