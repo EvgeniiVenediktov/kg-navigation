@@ -1,0 +1,31 @@
+@prefix ex: <http://my-robotic-vision-kg.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:Bird rdfs:subClassOf ex:Animal .
+
+ex:Cat rdfs:subClassOf ex:Animal .
+
+ex:DetectedBottle a ex:Bottle .
+
+ex:DetectedBox a ex:CardboardBox .
+
+ex:DetectedPerson a ex:Person .
+
+ex:Dog rdfs:subClassOf ex:Animal .
+
+ex:PlasticBag rdfs:subClassOf ex:LightObstacle .
+
+ex:Bottle rdfs:subClassOf ex:LightObstacle .
+
+ex:CardboardBox rdfs:subClassOf ex:HeavyObstacle .
+
+ex:HeavyObstacle ex:requiresAction ex:BehaviorAvoid .
+
+ex:Person rdfs:subClassOf ex:LivingBeing .
+
+ex:LightObstacle ex:requiresAction ex:BehaviorProceed .
+
+ex:LivingBeing ex:requiresAction ex:BehaviorHonkAndWait .
+
+ex:Animal rdfs:subClassOf ex:LivingBeing .
+
