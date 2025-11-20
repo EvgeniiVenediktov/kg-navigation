@@ -30,6 +30,7 @@ pyvis==0.3.2
 rdflib==7.1.4
 RdLib==0.9
 six==1.17.0
+shapely==2.1.2
 stack-data==0.6.3
 traitlets==5.14.3
 typing_extensions==4.15.0
