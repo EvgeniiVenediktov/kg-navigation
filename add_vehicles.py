@@ -14,8 +14,13 @@ spawn_points = world.get_map().get_spawn_points()
 
 # Spawn 50 vehicles randomly distributed throughout the map 
 # for each spawn point, we choose a random vehicle from the blueprint library
-for i in range(0,25):
+for i in range(0,80):
     world.try_spawn_actor(random.choice(vehicle_blueprints), random.choice(spawn_points))
+
+#print(world.get_actors())
 
 for vehicle in world.get_actors().filter('*vehicle*'):
     vehicle.set_autopilot(True)
+
+while True:
+    pass
