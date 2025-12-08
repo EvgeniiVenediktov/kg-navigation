@@ -32,6 +32,66 @@ class KG:
         for row in results:
             return row.behavior.split("/")[-1]
     
+    def sort_instances_by_importance(self, instances: list) -> list:
+        """
+        Sort a list of instances by their importance hierarchy from the knowledge graph.
+        Uses SPARQL to query hierarchy depth and behavior type to determine importance.
+        Returns the list sorted with least important instances first.
+        """
+        # Define importance order based on behavior types
+        # Lower number = less important
+        behavior_importance = {
+            "BehaviorProceed": 1,      # Light obstacles - least important
+            "BehaviorAvoid": 2,        # Heavy obstacles - medium importance
+            "BehaviorHonkAndWait": 3,  # Living beings - most important
+            "BehaviorStop": 4           # Highest priority if exists
+        }
+        
+        def get_importance_score(instance: str) -> tuple:
+            """
+            Get importance score for an instance.
+            Returns (behavior_importance, hierarchy_depth) where lower values = less important.
+            """
+            # Query to get behavior
+            q_behavior = """SELECT ?behavior 
+                    WHERE { 
+                        ex:%s a ?type . 
+                        ?type rdfs:subClassOf* ?parentClass .
+                        ?parentClass ex:requiresAction ?behavior .
+                    }""" % instance
+                    
+            behavior_results = self.graph.query(q_behavior, initNs={"ex": self.EX, "rdfs": RDFS})
+            
+            behavior_priority = 0
+            behavior_name = None
+            
+            for row in behavior_results:
+                behavior_name = str(row.behavior).split("/")[-1]
+                behavior_priority = behavior_importance.get(behavior_name, 0)
+                break  # Take first result
+            
+            # Query to get hierarchy depth (count of parent classes)
+            q_depth = """SELECT (COUNT(DISTINCT ?parentClass) as ?depth)
+                    WHERE { 
+                        ex:%s a ?type . 
+                        ?type rdfs:subClassOf* ?parentClass .
+                    }""" % instance
+                    
+            depth_results = self.graph.query(q_depth, initNs={"ex": self.EX, "rdfs": RDFS})
+            hierarchy_depth = 0
+            
+            for row in depth_results:
+                hierarchy_depth = int(row.depth) if row.depth else 0
+                break
+            
+            return (behavior_priority, hierarchy_depth)
+        
+        # Sort instances: least important first
+        # Sort by behavior priority first, then by hierarchy depth (shallower = less important)
+        sorted_instances = sorted(instances, key=lambda inst: get_importance_score(inst))
+        
+        return sorted_instances
+    
     def visualize(self, output_html: str="kg_visualization.html") -> None:
         net = Network(notebook=False, height="1080px", width="100%", directed=True, bgcolor="#FFFFFF", font_color="#000000")
 

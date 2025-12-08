@@ -6,6 +6,10 @@ import sys
 
 from agents.navigation.behavior_agent import BehaviorAgent
 
+from custom_controller import LaneChangeController
+
+
+
 class Col:
     GREEN = '\033[92m'
     RED = '\033[91m'
@@ -14,10 +18,12 @@ class Col:
 
 
 config = {
-    "launch_speed": 50,
-    "distance_to_leading": 2,
+    "launch_speed": 10,
+    "distance_to_leading": 25,
     "speed_percentage": 200,
-    "lane_change_p": 100,
+    "lane_change_p": 50,
+    "ignore_vehicles": False,
+
 }
 
 def main():
@@ -26,11 +32,6 @@ def main():
     client.set_timeout(20.0)
     world = client.load_world("Town04_Opt")
     
-    # settings = world.get_settings()
-    # settings.fixed_delta_seconds = 0.016
-    # settings.synchronous_mode = False
-    # world.apply_settings(settings)
-
     # 2. Get the Traffic Manager
     traffic_manager = client.get_trafficmanager(8000)
     
@@ -38,7 +39,7 @@ def main():
     blueprint_library = world.get_blueprint_library()
     vehicle_bp = blueprint_library.filter('vehicle.audi.tt')[0]
 
-    obstacle_bp = blueprint_library.filter('vehicle')[2]
+    obstacle_bp = blueprint_library.filter('static.prop.constructioncone')[0]
     
     spawn_points = world.get_map().get_spawn_points()
     # print(f"Total of {len(spawn_points)} spawn points")
@@ -46,6 +47,18 @@ def main():
     idx = 287
     spawn_point = spawn_points[idx]
     print(f"Spawning in the #{idx}")
+    carla_map = world.get_map()
+    spawn_waypoint = carla_map.get_waypoint(spawn_point.location)
+    
+    print(f"\nLane info at spawn point:")
+    print(f"  Road ID: {spawn_waypoint.road_id}")
+    print(f"  Lane ID: {spawn_waypoint.lane_id}")
+    print(f"  Lane change: {spawn_waypoint.lane_change}")
+    
+    left_lane = spawn_waypoint.get_left_lane()
+    right_lane = spawn_waypoint.get_right_lane()
+    print(f"  Left lane available: {left_lane is not None}")
+    print(f"  Right lane available: {right_lane is not None}")
 
     # 4. Spawn the Vehicle
     vehicle = world.try_spawn_actor(vehicle_bp, spawn_point)
@@ -93,24 +106,22 @@ def main():
             carla.Rotation(pitch=-90)
         ))
         
-        # vehicle.set_autopilot(True) 
         vehicle.set_autopilot(False)
-        # 6. Set the behavior
-        # traffic_manager.vehicle_percentage_speed_difference(vehicle, -config['speed_percentage'])
-        # traffic_manager.ignore_lights_percentage(vehicle, 100)
-        # traffic_manager.ignore_signs_percentage(vehicle, 100)
-        # # traffic_manager.ignore_vehicles_percentage(vehicle, 10)
-        # traffic_manager.random_left_lanechange_percentage(vehicle, config['lane_change_p']-30)
-        # traffic_manager.random_right_lanechange_percentage(vehicle, config['lane_change_p'])
-        # traffic_manager.distance_to_leading_vehicle(vehicle, config['distance_to_leading'])
 
         agent = BehaviorAgent(vehicle, behavior='aggressive')
+        behavior = agent._behavior
+        behavior.max_speed = 100
+        behavior.speed_lim_dist = 30       # Higher = more willing to approach speed limit
+        behavior.speed_decrease = 10       # Less speed decrease when following
+        behavior.safety_time = 1.5         # Lower = more aggressive (was 3)
+        behavior.min_proximity_threshold = 8  # Closer approach before reacting
+        behavior.braking_distance = 4      # Later braking (was 6)
+        behavior.overtake_counter = -1     # Start ready to overtake (will increment to 0 quickly)
+        behavior.tailgate_counter = 200
         
-        # You MUST give the agent a destination, or it won't know where to go.
-        # We just pick a random point far away.
         destination = carla.Location(spawn_point.location.x-10, spawn_point.location.y+150, spawn_point.location.z+0.1)
         agent.set_destination(destination)
-        agent.ignore_vehicles(active=True)
+        agent.ignore_vehicles(active=config['ignore_vehicles'])
         agent.set_target_speed(100)
         # Keep the script running so the car doesn't disappear
         try:
