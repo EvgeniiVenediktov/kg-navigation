@@ -1,33 +1,43 @@
 @prefix ex: <http://my-robotic-vision-kg.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-ex:Bird rdfs:subClassOf ex:Animal .
-
-ex:Bottle rdfs:subClassOf ex:LightObstacle .
-
-ex:Cat rdfs:subClassOf ex:Animal .
-
 ex:DetectedBag a ex:PlasticBag .
+
+ex:DetectedBird a ex:Bird .
+
+ex:DetectedBottle a ex:Bottle .
 
 ex:DetectedBox a ex:CardboardBox .
 
 ex:DetectedCar a ex:Car .
 
+ex:DetectedCat a ex:Cat .
+
+ex:DetectedDog a ex:Dog .
+
 ex:DetectedPerson a ex:Person .
 
-ex:Dog rdfs:subClassOf ex:Animal .
+ex:DetectedPlasticBag a ex:PlasticBag .
+
+ex:Bird rdfs:subClassOf ex:Animal .
+
+ex:Bottle rdfs:subClassOf ex:LightObstacle .
 
 ex:Car rdfs:subClassOf ex:HeavyObstacle .
 
 ex:CardboardBox rdfs:subClassOf ex:HeavyObstacle .
 
+ex:Cat rdfs:subClassOf ex:Animal .
+
+ex:Dog rdfs:subClassOf ex:Animal .
+
 ex:Person ex:moreImportantThan ex:Animal ;
     rdfs:subClassOf ex:LivingBeing .
 
-ex:PlasticBag rdfs:subClassOf ex:LightObstacle .
-
 ex:LivingBeing ex:moreImportantThan ex:HeavyObstacle ;
     ex:requiresAction ex:BehaviorAvoid .
+
+ex:PlasticBag rdfs:subClassOf ex:LightObstacle .
 
 ex:HeavyObstacle ex:moreImportantThan ex:LightObstacle ;
     ex:requiresAction ex:BehaviorAvoid .

@@ -72,11 +72,21 @@ detected_person = EX.DetectedPerson
 detected_bag= EX.DetectedBag
 detected_box = EX.DetectedBox
 detected_car = EX.DetectedCar
+detected_plastic_bag = EX.DetectedPlasticBag
+detected_bottle = EX.DetectedBottle
+detected_cat = EX.DetectedCat
+detected_dog = EX.DetectedDog
+detected_bird = EX.DetectedBird
 
 graph.add((detected_person, RDF.type, person))
 graph.add((detected_bag, RDF.type, plastic_bag))
 graph.add((detected_car, RDF.type, car))
 graph.add((detected_box, RDF.type, cardboard_box))
+graph.add((detected_plastic_bag, RDF.type, plastic_bag))
+graph.add((detected_bottle, RDF.type, bottle))
+graph.add((detected_cat, RDF.type, cat))
+graph.add((detected_dog, RDF.type, dog))
+graph.add((detected_bird, RDF.type, bird))
 
 
 graph.serialize(destination="./base_kg.ttl", format="turtle")

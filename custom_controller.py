@@ -1,9 +1,13 @@
 import carla
 import math
 
+MODE_LEFT = "left"
+MODE_STRAIGHT = "straight"
+MODE_RIGHT = "right"
+
 class LaneChangeController:
-    """Minimal controller that changes lanes based on obstacle decisions."""
-    
+    """Controller that can change left, hold lane, or change right."""
+        
     def __init__(self, vehicle, world):
         self.vehicle = vehicle
         self.world = world
@@ -12,15 +16,41 @@ class LaneChangeController:
         # Lane offset in meters (negative = left, positive = right)
         self.lane_width = 3.5
         self.target_offset = 0.0  # Lateral offset from current path
+        self.mode = MODE_STRAIGHT
         
     def set_lane_offset(self, offset):
         """
         Set target lane relative to current.
-        -1 = one lane left, +1 = one lane right, 0 = stay
+        Accepts -1/0/1 or MODE_LEFT/MODE_STRAIGHT/MODE_RIGHT.
         """
-        self.target_offset = offset * self.lane_width
+        if isinstance(offset, str):
+            if offset == MODE_LEFT:
+                offset = -1
+            elif offset == MODE_RIGHT:
+                offset = 1
+            elif offset == MODE_STRAIGHT:
+                offset = 0
+            else:
+                raise ValueError(f"Unknown lane offset value: {offset}")
+        self.target_offset = float(offset) * self.lane_width
     
-    def run_step(self, target_speed=80):
+    def set_mode(self, mode):
+        """Select lane change mode and update target offset accordingly."""
+        if mode not in (MODE_LEFT, MODE_STRAIGHT, MODE_RIGHT):
+            raise ValueError(f"Unknown mode: {mode}")
+        self.mode = mode
+        if mode == MODE_LEFT:
+            self.set_lane_offset(-1)
+        elif mode == MODE_RIGHT:
+            self.set_lane_offset(1)
+        else:
+            self.set_lane_offset(0)
+    
+    def run_step(self, target_speed=80, emergency_brake=False):
+        if emergency_brake:
+            # Full stop regardless of current mode
+            return carla.VehicleControl(throttle=0.0, steer=0.0, brake=1.0)
+        
         v = self.vehicle.get_velocity()
         speed = 3.6 * math.sqrt(v.x**2 + v.y**2 + v.z**2)
         
