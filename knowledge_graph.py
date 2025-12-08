@@ -124,6 +124,6 @@ class KG:
 
 if __name__ == "__main__":
     kg = KG()
-    # kg.visualize()
+    kg.visualize()
     behavior = kg.get_behavior_for_instance("DetectedPerson")
     print(f"Recommended behavior for DetectedPerson: {behavior}")

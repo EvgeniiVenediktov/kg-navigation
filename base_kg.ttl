@@ -3,29 +3,36 @@
 
 ex:Bird rdfs:subClassOf ex:Animal .
 
+ex:Bottle rdfs:subClassOf ex:LightObstacle .
+
 ex:Cat rdfs:subClassOf ex:Animal .
 
-ex:DetectedBottle a ex:Bottle .
+ex:DetectedBag a ex:PlasticBag .
 
 ex:DetectedBox a ex:CardboardBox .
+
+ex:DetectedCar a ex:Car .
 
 ex:DetectedPerson a ex:Person .
 
 ex:Dog rdfs:subClassOf ex:Animal .
 
-ex:PlasticBag rdfs:subClassOf ex:LightObstacle .
-
-ex:Bottle rdfs:subClassOf ex:LightObstacle .
+ex:Car rdfs:subClassOf ex:HeavyObstacle .
 
 ex:CardboardBox rdfs:subClassOf ex:HeavyObstacle .
 
-ex:HeavyObstacle ex:requiresAction ex:BehaviorAvoid .
+ex:Person ex:moreImportantThan ex:Animal ;
+    rdfs:subClassOf ex:LivingBeing .
 
-ex:Person rdfs:subClassOf ex:LivingBeing .
+ex:PlasticBag rdfs:subClassOf ex:LightObstacle .
+
+ex:LivingBeing ex:moreImportantThan ex:HeavyObstacle ;
+    ex:requiresAction ex:BehaviorAvoid .
+
+ex:HeavyObstacle ex:moreImportantThan ex:LightObstacle ;
+    ex:requiresAction ex:BehaviorAvoid .
 
 ex:LightObstacle ex:requiresAction ex:BehaviorProceed .
-
-ex:LivingBeing ex:requiresAction ex:BehaviorHonkAndWait .
 
 ex:Animal rdfs:subClassOf ex:LivingBeing .
 
